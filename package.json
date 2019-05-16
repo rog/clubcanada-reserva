@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "vue": "^2.6.10"
+    "lodash.find": "^4.6.0",
+    "lodash.findindex": "^4.6.0",
+    "vue": "^2.6.10",
+    "vuejs-datepicker": "^1.5.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.7.0",
