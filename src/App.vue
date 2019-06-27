@@ -14,7 +14,7 @@
           </label>
           <label class="BookingForm__Label">
             <span class="BookingForm__LabelTitle">¿Cuál es su fecha de nacimiento?</span>
-            <div class="BookingForm__Age">
+            <div v-if="birthdayDateFormated" class="BookingForm__Age">
               <span>{{ birthdayDateFormated || '&nbsp;' }}</span>
             </div>
             <datepicker
@@ -86,8 +86,8 @@
           <transition name="fade">
             <div v-if="calendarLoaded" class="BookingForm__Loader">
               <div v-show="reservationsNum > 0">
-                <p class="BookingForm__Loader__Label">Selecciona un día</p>
                 <div class="BookingForm__Days">
+                  <p class="BookingForm__Loader__Label">Filtrar por día:</p>
                   <button
                     @click="filterDays('Mon')"
                     :disabled="reservationsDay['Mon'] === 0"
@@ -149,13 +149,14 @@
                 </div>
               </div>
               <div v-if="reservationsNum === 0" class="BookingForm__NoResults">
-                <p class="book-steps-ready"><span class="book-steps-ready-newline">No hay clases disponibles.<br />Por favor selecciona otra sucursal, si tienes dudas</span><br /><span class="book-steps-ready-secondline">¡<span class="book-steps-ready-chat manychatbtn" @click="openChat">chatea con nosotros</span> o <a href="tel:+015555687300" class="book-steps-ready-phone">háblanos por teléfono</a>!</span></p>
+                <p class="book-steps-ready"><span class="book-steps-ready-newline">No hay clases de prueba disponibles.<br />Por favor selecciona otra sucursal, si tienes dudas</span><br /><span class="book-steps-ready-secondline">¡<span class="book-steps-ready-chat manychatbtn" @click="openChat">chatea con nosotros</span> o <a href="tel:+015555687300" class="book-steps-ready-phone">háblanos por teléfono</a>!</span></p>
               </div>
             </div>
           </transition>
         </div>
       </div>
     </div>
+    <div class="Sprite__Preload"></div>
   </div>
 </template>
 
@@ -206,13 +207,13 @@ export default {
       calendarLoading: false,
       reservationsNum: null,
       reservationsDay: {
+        'Sun': 0,
         'Mon': 0,
         'Tue': 0,
         'Wed': 0,
         'Thu': 0,
         'Fri': 0,
-        'Sat': 0,
-        'Sun': 0
+        'Sat': 0
       },
       selectedDay: null
     }
@@ -221,6 +222,9 @@ export default {
     let today = new Date()
     let start = new Date()
     let end = new Date()
+    let sucursal = this.getParameterByName('sucursal')
+    let location = find(locationsData, { 'code': sucursal.toUpperCase() })
+    this.swimmerLocation = location.code
     end.setFullYear(today.getFullYear() - 70)
     start.setMonth(today.getMonth() - 3)
     this.dates = {
@@ -230,8 +234,29 @@ export default {
     window.addEventListener('resize', (event) => {
       this.calendarWide = window.innerWidth < 650
     })
+    /*
+    let dayNum = today.getDay()
+    let reset = false
+    for (let i = 0, k = 0; i < 7; i++, k++) {
+      if (dayNum + k === 7) {
+        k = 0
+        reset = true
+      }
+      console.group()
+      console.log('dayNum', dayNum)
+      console.log('i', i)
+      console.log('k', k)
+      console.log(Object.keys(this.reservationsDay)[!reset ? dayNum + k : k])
+      console.groupEnd()
+    } */
   },
   methods: {
+    getParameterByName (name) {
+      name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]')
+      let regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
+      let results = regex.exec(location.search)
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '))
+    },
     getBirthday (day) {
       let monthsName = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
       let today = new Date()
@@ -315,8 +340,8 @@ export default {
         $('.responsive-table tbody tr').hide()
         for (; i < elems.length; i++) {
           $(elems[i].parentElement).fadeIn()
-          that.selectedDay = day
         }
+        that.selectedDay = day
       })(jQuery)
     },
     bookingFormBack () {
@@ -376,9 +401,9 @@ export default {
   }
   &__Step {
     display: flex;
-    margin: 20px 0;
+    margin: 0;
     padding: 30px 0;
-    justify-content: center;
+    justify-content: space-around;
     @media (max-width: 650px) {
       padding: 20px 0;
       flex-wrap: wrap;
@@ -408,7 +433,7 @@ export default {
     }
     label {
       display: block;
-      padding: 0 0 20px 0;
+      padding: 0 0 10px 0;
     }
     &__Expanded {
       width: 300px;
@@ -494,13 +519,17 @@ export default {
     }
   }
   &__Age {
-    color: #f7e303;
     display: block;
     width: 100%;
-    text-align: left;
+    text-align: center;
     font-weight: bold;
-    padding: 0 0 10px 10px;
+    padding: 7px 0;
+    margin: 0 0 5px 0;
     letter-spacing: 2px;
+    color: #12256f;
+    background: #f7e303;
+    border: 1px solid #f7e303;
+    border-radius: 4px;
     @media (max-width: 650px) {
       width: auto;
     }
@@ -637,6 +666,7 @@ export default {
     }
   }
   &__Days {
+    margin: 15px 0;
     &__Button {
       border: none;
       border-radius: 5px;
@@ -646,6 +676,7 @@ export default {
       padding: 10px 15px;
       margin: 10px;
       &:disabled{
+        display: none;
         background: #dbdbdb !important;
         color: #a1a1a1 !important;
       }
@@ -656,8 +687,8 @@ export default {
     }
   }
   &__Calendar {
-    color: #666;
-    background: #fff;
+    color: #3c484e;
+    background: #f4f8fb;
     max-height: 480px;
     margin: 10px auto 0 auto;
     border-radius: 9px;
@@ -671,7 +702,8 @@ export default {
     &__Label {
       color: #fff;
       padding: 0;
-      margin: 10px 0 0 0;
+      margin: 0 10px;
+      display: inline;
     }
   }
   &__NoResults {
@@ -681,6 +713,9 @@ export default {
   }
 }
 .Sprite {
+  &__Preload {
+    background: url(https://www.ccnatacion.com/wp-content/themes/stockholm-child/img/programas/sprite.png) no-repeat;
+  }
   background: url(https://www.ccnatacion.com/wp-content/themes/stockholm-child/img/programas/sprite.png) no-repeat;
   display: inline-block;
   overflow: hidden;

@@ -20,9 +20,9 @@ const locationsData = {
     classes: ['menor3-anos', 'mayor3-anos', 'adultos'],
     max: ['aquayoga']
   },
-  santafe: {
+  SANTAFE: {
     name: 'Garden Santa Fe',
-    code: 'santafe',
+    code: 'SANTAFE',
     location: 'Grand San Francisco 5525<br />Col. Alcantarilla, c.p: 01729<br />Delegación: Alvaro Obregón<br />Ciudad de México, México',
     classes: ['menor3-anos', 'mayor3-anos', 'adultos'],
     max: ['aquayoga']
